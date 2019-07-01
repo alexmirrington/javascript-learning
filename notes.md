@@ -9,9 +9,11 @@
 - When embedding JS, place *script* tag at end of body, so HTML loads first.
 - We can run JS in the browser console.
 - Write to console from script: 
-```console.log('Hello World!')`
-`console.error()`
-`console.warn()`
+```Javascript
+console.log('Hello World!')
+console.error()
+console.warn()
+```
 
 
 ## Syntax
@@ -137,7 +139,7 @@ const person = new Person('John', 'Smith', 1-1-1970);
 console.log(person.getFullName())
 ```
 **ES6**
-Does the same thing under the hood, but is nicer to look at. 
+Does the same thing under the hood, but is nicer to write and maintain. 
 ```Javascript
 // This is the same as above, but in a class.
 // Constructor function
