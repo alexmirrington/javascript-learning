@@ -9,7 +9,7 @@
 - When embedding JS, place *script* tag at end of body, so HTML loads first.
 - We can run JS in the browser console.
 - Write to console from script: 
-`console.log('Hello World!')`
+```console.log('Hello World!')`
 `console.error()`
 `console.warn()`
 
@@ -164,14 +164,14 @@ console.log(person.getFullName())
 Additional notes:
 `this` keyword in arrow functions has a different scope.
 
-## var, let and const
-- `var` is *globally scoped*, and thus should be replaced with `let` or `const` to avoid problems.
-- `let` and `const` were introduced in ES6 (2015).
-- `let` allows reassignment, `const` does not (naturally).
-- `const` must be initialised at declaration point. `let` can be initialised later, and will have value `undefined`.
+
+### Interfaces
+TODO
 
 
 ## Data types
+
+### Overview
 Use `typeof myVar` to get the type of an object.
 
 **Primitive**
@@ -188,7 +188,14 @@ Use `typeof myVar` to get the type of an object.
 Note: `typeof null` returns `object`. Don't rely on this behaviour. 
 
 
-## String operations
+### var, let and const
+- `var` is *globally scoped*, and thus should be replaced with `let` or `const` to avoid problems.
+- `let` and `const` were introduced in ES6 (2015).
+- `let` allows reassignment, `const` does not (naturally).
+- `const` must be initialised at declaration point. `let` can be initialised later, and will have value `undefined`.
+
+
+### String operations
 ```Javascript
 const s = 'This is a sentence';
 console.log(s.split());
@@ -202,7 +209,7 @@ age = 20;
 console.log(`${name} is ${age} years old.`);
 ```
 
-## Arrays
+### Arrays
 Similar to a Python list, in that it supports multiple data types.
 
 ```Javascript
@@ -241,7 +248,7 @@ Additional notes:
 - `const` just ensures memory address doesn't change, however the contents of the array can.
 
 
-## Object literals / anonymous objects
+### Object literals / anonymous objects
 ```Javascript
 const person = {
     firstName: 'Alex',
@@ -282,3 +289,97 @@ const personJSON = JSON.stringify(person);
 Additional notes:
 - `const` just ensures memory address doesn't change, however the contents of the object can.
 
+
+## Document Object Model (DOM)
+The Window object is the top level object in the browser. It contains the `alert` function, and `localStorage` function, for example. It also contains the `document` object and the `fetch` function.
+
+Note that we don't need to do `window.alert()`, we can just do `alert()`, but it's good to knnow what's happening behind the scenes.
+
+
+### Selection
+
+```HTML
+<html>
+  <body>
+    <form id="login-form">
+      <div class="field">
+        <label for="name">Name:</label>
+        <input type="text" id="name">
+      </div>
+      <div class="field">
+        <label for="email">Email:</label>
+        <input type="text" id="email">
+      </div>
+      <input type="submit" value="Submit">
+    </form>
+  </body>
+</html>
+```
+
+#### Single element selectors
+```Javascript
+const loginForm = document.getElementByID('login-form') // Returns the HTML element with the specified ID
+
+// JQuery can be used to select things by attributes other than ID, e.g. class, tags etc. Now we can just use querySelector.
+const login = document.querySelector('#login-form') // Returns the first HTML element with a certain id.
+const div = document.querySelector('.field') // Returns the first HTML element with a certain class.
+const inputs = document.querySelector('input') // Returns the first HTML element with a certain tag.
+```
+
+#### Multiple element selectors
+```Javascript
+const divs = document.querySelectorAll('.field') // Returns all HTML elements with a certain class, in a NodeList structure, which supports forEach, map etc.
+divs.forEach((div) => console.log(div));
+
+// There are older ones e.g. document.getElementByClassName and document.getElementByTagName (returns an HTMLCollection, which needs to be manually converted to an array)
+```
+
+### Operations on DOM elements
+Removing DOM elements:
+```Javascript
+const div = document.querySelector('.field');
+div.remove(); // Removes element from DOM
+```
+
+Adding DOM elements:
+```Javascript
+const main = document.querySelector('#main');
+
+const ul = document.createElement('ul');
+ul.appendChild(document.createTextNode('Content'));
+
+main.appendChild(ul);
+```
+
+Setting text and inner HTML content:
+```Javascript
+const ul = document.querySelector('.items');
+
+ul.firstElementChild.textContent = 'This is the first item';
+console.log(ul.firstElementChild.value);
+ul.children[1].innerText = 'This is the second item';
+ul.lastElementChild.innerHTML = '<h1>Inserted HTML!</h1>'
+```
+
+Setting styles:
+```Javascript
+const btn = document.querySelector('.btn');
+btn.style.background = 'red';
+```
+
+Adding event listeners:
+```Javascript
+const btn = document.querySelector('.btn');
+btn.addEventListener('click', e => {
+    e.preventDefault(); // Can be used to prevent default event behaviour
+    console.log('Clicked button');
+    console.log(e.target);
+})
+
+// Other event listeners include 'mouseover' and 'mouseout' 
+```
+
+Setting timeouts:
+```Javascript
+setTimeout(() => console.log('Triggered'), 3000); // Returns a timeout object and triggers the callback after the set amount of milliseconds.
+```
