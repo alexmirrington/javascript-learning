@@ -4,18 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+
     <title>Todo List</title>
 </head>
 <body>
     <main>
-        <form id="form-add-item">
-            <label for="input-item">Add a task:</label>
-            <input id="input-item" type="text">
-            <button id="form-add-item-submit" type="submit">Add</button>
-        </form>
-        <ul id="list">
-            
-        </ul>
+        <div class="flex-container">
+            <div class="flex-item">
+                <form id="form-add-item" autocomplete="off">
+                    <label for="input-item">Add a task:</label>
+                    <input id="input-item" type="text">
+                    <button id="form-add-item-submit" type="submit">Add</button>
+                </form>
+                <div id="list" class="list">
+                    
+                </div>
+            </div>
+        </div>
     </main>
 
     <script src="index.js"></script>

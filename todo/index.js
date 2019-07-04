@@ -11,42 +11,47 @@ class ItemList {
             return;
         }
 
-        this.items.push(new Item(this.idCursor, text));
+        // Add to DOM
+        let itemNode = document.createElement('div');
+        itemNode.className = 'list-item';
 
-        let itemNode = document.createElement('li');
-        itemNode.innerText = text;
-        itemNode.id = `list-item-${this.idCursor}`
+        let itemText = document.createTextNode(text);
 
         let itemRemoveButton = document.createElement('button');
         itemRemoveButton.innerText = 'Remove'
-        itemRemoveButton.onclick = event => this.removeByID(this.idCursor);
 
+        itemNode.appendChild(itemText);
         itemNode.appendChild(itemRemoveButton);
+
         this.root.appendChild(itemNode);
 
-        this.idCursor++;
+        // Add to list
+        let addedItem = {
+            id: this.idCursor,
+            elem: itemNode
+        }
+        console.log(addedItem);
+        console.log(this.items);
 
+        this.items.push(addedItem);
+
+        // Register callbacks
+        itemRemoveButton.onclick = event => this.removeItem(addedItem);
+
+        this.idCursor++;
     }
 
-    removeByID(id) {
-        console.log('removed');
-        let idx = this.items.findIndex(item => item.id === id);
-        console.log(idx);
+    removeItem(item) {
+        console.log(item);
+        console.log(this.items);
+        let idx = this.items.findIndex(i => item.id === i.id);
         if (idx === -1) {
             return;
         }
-        this.items.splice(idx);        
-        let elem = this.root.querySelector(`#list-item-${id}`);
-        this.root.remove(elem);
+        this.items.splice(idx, 1);
+        item.elem.remove();
     }
 
-}
-
-class Item {
-    constructor(id, text) {
-        this.id = id;
-        this.text = text;
-    }
 }
 
 let listElem = document.querySelector('#list');
@@ -57,7 +62,9 @@ let list = new ItemList(listElem);
 itemButton.onclick = event => {
     event.preventDefault();
     let form = event.target.form;
-    let itemText = form.querySelector('#input-item').value;
+    let ipt = form.querySelector('#input-item');
+    let itemText = ipt.value;
+    ipt.value = '';
     list.addItem(itemText);
 }
 
