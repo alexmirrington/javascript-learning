@@ -61,22 +61,38 @@ class ItemList {
     }
 
     save() {
-        let toSave = this.items.map(item => {
-            return {
-                value: item.elem.querySelector('p').innerText
-            };
-        });
-        localStorage['items'] = JSON.stringify(toSave);
+        if (localStorageAvailable()) {
+            let toSave = this.items.map(item => {
+                return {
+                    value: item.elem.querySelector('p').innerText
+                };
+            });
+            localStorage.setItem('items', JSON.stringify(toSave));
+        }
     }
 
     load() {
-        // TODO: Handle uninitialised localStorage and errors.
-        let toLoad = JSON.parse(localStorage['items']);
-        toLoad.forEach(element => {
-            this.addItem(element.value);
-        });
+        if (localStorageAvailable()) {
+            let data = localStorage.getItem('items');
+            if (data !== null) {
+                let toLoad = JSON.parse(data);
+                toLoad.forEach(element => {
+                    this.addItem(element.value);
+                });
+            }
+        }
     }
+}
 
+function localStorageAvailable() {
+    let testStr = '__test__';
+    try {
+        localStorage.setItem(testStr, testStr);
+        localStorage.removeItem(testStr);
+        return true;
+    } catch(e) {
+        return false;
+    }
 }
 
 let listElem = document.querySelector('#list');
