@@ -1,0 +1,24 @@
+* {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif 
+}
+
+h1 {
+    text-align: center;
+}
+
+p {
+    margin: 0;
+    padding: 0;
+}
+
+.flex-container {
+    display: flex;
+    align-items: center;
+    max-width: 400px;
+    margin: auto;
+}
+
+.flex-item {
+    width: auto;
+    margin: auto;
+}
