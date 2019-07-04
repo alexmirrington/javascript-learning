@@ -1,111 +1,54 @@
-class ItemList {
+'use strict';
 
-    constructor(root, persist=true) {
-        this.root = root
-        this.items = [];
-        this.persist = persist;
-        this.idCursor = 0;
-
-        this.load();
-    }
-
-    addItem(text) {
-        if (text === '') {
-            return;
-        }
-
-        // Add to DOM
-        let itemNode = document.createElement('div');
-        itemNode.className = 'list-item';
-
-        let itemText = document.createElement('p');
-        itemText.innerText = text;
-
-        let itemRemoveButton = document.createElement('button');
-        itemRemoveButton.innerText = 'Remove';
-
-        itemNode.appendChild(itemText);
-        itemNode.appendChild(itemRemoveButton);
-
-        this.root.appendChild(itemNode);
-
-        // Add to list
-        let addedItem = {
-            id: this.idCursor,
-            elem: itemNode
-        }
-
-        this.items.push(addedItem);
-
-        // Register callbacks
-        itemRemoveButton.onclick = event => this.removeItem(addedItem);
-
-        if (this.persist) {
-            this.save();
-        }
-
-        this.idCursor++;
-    }
-
-    removeItem(item) {
-        let idx = this.items.findIndex(i => item.id === i.id);
-        if (idx === -1) {
-            return;
-        }
-        this.items.splice(idx, 1);
-        item.elem.remove();
-
-        if (this.persist) {
-            this.save();
-        }
-    }
-
-    save() {
-        if (localStorageAvailable()) {
-            let toSave = this.items.map(item => {
-                return {
-                    value: item.elem.querySelector('p').innerText
-                };
-            });
-            localStorage.setItem('items', JSON.stringify(toSave));
-        }
-    }
-
-    load() {
-        if (localStorageAvailable()) {
-            let data = localStorage.getItem('items');
-            if (data !== null) {
-                let toLoad = JSON.parse(data);
-                toLoad.forEach(element => {
-                    this.addItem(element.value);
-                });
-            }
-        }
-    }
+function main() {
+    let graph = new Graph(400, 225);
+    graph.setMount(document.querySelector('#mount'));
+    graph.render();
 }
 
-function localStorageAvailable() {
-    let testStr = '__test__';
-    try {
-        localStorage.setItem(testStr, testStr);
-        localStorage.removeItem(testStr);
-        return true;
-    } catch(e) {
-        return false;
+class Graph {
+
+    constructor(width, height) {
+        this.mount = null;
+        this.root = null;
+
+        this.width = width;
+        this.height = height;
+        
+        // TODO: Decide on data format and accept actual data in params
+        this.data = Array.from(
+            {length: 25}, () => Math.random()
+        );
     }
+
+    setMount(node) {
+        // TODO: manage unmounting
+        this.mount = node;
+    }
+
+    render() {
+        this.root = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        this.root.setAttribute('width', this.width);
+        this.root.setAttribute('height', this.height);
+
+        // TODO: Axes
+
+        // Columns
+        // TODO: Data normalisation
+        this.data.forEach((value, index) => {
+            let col = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            let gap = 5;
+            col.setAttribute('x', index * this.width / this.data.length + gap / 2.0);
+            col.setAttribute('y', this.height * (1-value));
+            col.setAttribute('width', this.width / this.data.length - gap);
+            col.setAttribute('height', value * this.height); // Assumes normalised data
+            col.setAttribute('style', 'fill:rgb(240,240,240);');
+            this.root.appendChild(col);
+        });
+
+        this.mount.appendChild(this.root);
+    }
+
 }
 
-let listElem = document.querySelector('#list');
-let itemButton = document.querySelector('#form-add-item-submit');
-
-let list = new ItemList(listElem);
-
-itemButton.onclick = event => {
-    event.preventDefault();
-    let form = event.target.form;
-    let ipt = form.querySelector('#input-item');
-    let itemText = ipt.value;
-    ipt.value = '';
-    list.addItem(itemText);
-}
-
+main();
