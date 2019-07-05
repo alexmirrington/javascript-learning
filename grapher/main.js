@@ -70,7 +70,8 @@ class Graph {
         // TODO: Fix text font sizes so they are consistent
         // TOOD: Enable colour customisation
         // TODO: move constants somewhere else
-        let axisLabelAreaWidth = 50;
+        let titleAreaSize = 40;
+        let axisLabelAreaSize = 50;
         let gap = 10
 
         // Determine scale
@@ -84,12 +85,29 @@ class Graph {
         let pow = Math.floor(Math.log10(Math.abs(maxVal))) + 1;
         let increment = 10**(pow-1);
 
-        // TODO: Axis titles
+        let title = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        title.setAttribute('x', 0);
+        title.setAttribute('y', 0);
+        title.setAttribute('width', this.width);
+        title.setAttribute('height', titleAreaSize);
+
+        let titleLbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        let titleTxt = document.createTextNode(this.data.title);
+        titleLbl.appendChild(titleTxt);
+        titleLbl.setAttribute('x', title.width.baseVal.value*0.5);
+        titleLbl.setAttribute('y', title.height.baseVal.value*0.5);
+        const titleLblTxtWidth = title.width.baseVal.value / titleTxt.length;
+        const titleLblTxtHeight = title.height.baseVal.value/2.0;
+        titleLbl.setAttribute('font-size', `${Math.min(titleLblTxtWidth, titleLblTxtHeight)}px`);
+        titleLbl.setAttribute('dominant-baseline', 'central');
+        titleLbl.setAttribute('text-anchor', 'middle');
+        title.appendChild(titleLbl);
+
         let xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        xAxis.setAttribute('x', axisLabelAreaWidth);
-        xAxis.setAttribute('y', this.height - axisLabelAreaWidth);
-        xAxis.setAttribute('width', this.width - axisLabelAreaWidth);
-        xAxis.setAttribute('height', axisLabelAreaWidth);
+        xAxis.setAttribute('x', axisLabelAreaSize);
+        xAxis.setAttribute('y', this.height - axisLabelAreaSize);
+        xAxis.setAttribute('width', this.width - axisLabelAreaSize);
+        xAxis.setAttribute('height', axisLabelAreaSize);
 
         let xAxisTitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         let xAxisTitleTxt = document.createTextNode(this.data.axes[0].title);
@@ -128,9 +146,9 @@ class Graph {
 
         let yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         yAxis.setAttribute('x', 0);
-        yAxis.setAttribute('y', 0);
-        yAxis.setAttribute('width', axisLabelAreaWidth);
-        yAxis.setAttribute('height', this.height);
+        yAxis.setAttribute('y', titleAreaSize);
+        yAxis.setAttribute('width', axisLabelAreaSize);
+        yAxis.setAttribute('height', this.height - titleAreaSize);
 
         let yAxisTitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         let yAxisTitleTxt = document.createTextNode(this.data.axes[1].title);
@@ -139,7 +157,7 @@ class Graph {
         yAxisTitle.setAttribute('y', yAxis.height.baseVal.value*0.5);
         yAxisTitle.setAttribute('transform', `rotate(-90, ${yAxis.width.baseVal.value*0.25}, ${yAxis.height.baseVal.value*0.5})`);
         const yAxisTitleTxtWidth = yAxis.height.baseVal.value / yAxisTitleTxt.length;
-        const yAxisTitleTxtHeight = yAxis.width.baseVal.value;
+        const yAxisTitleTxtHeight = yAxis.width.baseVal.value/4.0;
         yAxisTitle.setAttribute('font-size', `${Math.min(yAxisTitleTxtWidth, yAxisTitleTxtHeight)}px`);
         yAxisTitle.setAttribute('dominant-baseline', 'central');
         yAxisTitle.setAttribute('text-anchor', 'middle');
@@ -149,7 +167,7 @@ class Graph {
         yAxisLine.setAttribute('x1', '100%');
         yAxisLine.setAttribute('y1', '0%');
         yAxisLine.setAttribute('x2', '100%');
-        yAxisLine.setAttribute('y2', yAxis.height.baseVal.value - axisLabelAreaWidth);
+        yAxisLine.setAttribute('y2', yAxis.height.baseVal.value - axisLabelAreaSize);
         yAxisLine.setAttribute('stroke', 'black');
         yAxis.appendChild(yAxisLine);
 
@@ -163,16 +181,16 @@ class Graph {
         ticks.forEach((value, index) => {
             let tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             tick.setAttribute('x1', '95%');
-            tick.setAttribute('y1', (ticks.length - index) * (yAxis.height.baseVal.value - axisLabelAreaWidth) / ticks.length);
+            tick.setAttribute('y1', (ticks.length - index) * (yAxis.height.baseVal.value - axisLabelAreaSize) / ticks.length);
             tick.setAttribute('x2', '100%');
-            tick.setAttribute('y2', (ticks.length - index) * (yAxis.height.baseVal.value - axisLabelAreaWidth) / ticks.length);
+            tick.setAttribute('y2', (ticks.length - index) * (yAxis.height.baseVal.value - axisLabelAreaSize) / ticks.length);
             tick.setAttribute('stroke', 'black');
 
             let lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             let txt = document.createTextNode(value.toFixed(Math.max(0, -(pow-1))));
             lbl.appendChild(txt);
             lbl.setAttribute('x', '90%');
-            lbl.setAttribute('y', (ticks.length - index) * (yAxis.height.baseVal.value - axisLabelAreaWidth) / ticks.length);
+            lbl.setAttribute('y', (ticks.length - index) * (yAxis.height.baseVal.value - axisLabelAreaSize) / ticks.length);
             const txtWidth = yAxis.width.baseVal.value / txt.length;
             const txtHeight = yAxis.height.baseVal.value / (2.5 * ticks.length);
             lbl.setAttribute('font-size', `${Math.min(txtWidth, txtHeight)}px`);
@@ -185,10 +203,10 @@ class Graph {
 
         // Columns
         let columns = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        columns.setAttribute('x', axisLabelAreaWidth);
-        columns.setAttribute('y', 0);
-        columns.setAttribute('width', this.width - axisLabelAreaWidth);
-        columns.setAttribute('height', this.height - axisLabelAreaWidth);
+        columns.setAttribute('x', axisLabelAreaSize);
+        columns.setAttribute('y', titleAreaSize);
+        columns.setAttribute('width', this.width - axisLabelAreaSize);
+        columns.setAttribute('height', this.height - axisLabelAreaSize - titleAreaSize);
 
         this.data.values.forEach((value, index) => {
             let col = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -200,6 +218,7 @@ class Graph {
             columns.appendChild(col);
         });
 
+        this.root.appendChild(title);
         this.root.appendChild(xAxis);
         this.root.appendChild(yAxis);
         this.root.appendChild(columns);
