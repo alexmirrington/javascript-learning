@@ -1,21 +1,52 @@
 'use strict';
 
 function main() {
-    let data = {
-        title: 'Weather',
-        values: Array.from({length: 12}, () => Math.random()*100),
-        axes: [
-            {
-                title: 'Month',
-                labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-            },
-            {
-                title: 'Average temperature'
-            }
-        ]
-    }
-    let graph = new Graph(document.querySelector('#column-graph'), data);
-    graph.render();
+
+    let count = 10;
+    getTopCryptocurrencies('aud', count).then(json => {
+        let data = {
+            title: 'Market',
+            values: Array.from(json, (v, i) => v.market_cap),
+            axes: [
+                {
+                    title: 'Coin',
+                    labels: Array.from(json, (v, i) => v.symbol)
+                },
+                {
+                    title: 'Market cap (AUD)'
+                }
+            ]
+        }
+        let graph = new Graph(document.querySelector('#column-graph-1'), data);
+        graph.render();
+
+        let data2 = {
+            title: 'Prices',
+            values: Array.from(json, (v, i) => v.current_price),
+            axes: [
+                {
+                    title: 'Coin',
+                    labels: Array.from(json, (v, i) => v.symbol)
+                },
+                {
+                    title: 'Current price (AUD)'
+                }
+            ]
+        }
+        let graph2 = new Graph(document.querySelector('#column-graph-2'), data2);
+        graph2.render();
+    });
+}
+
+async function getTopCryptocurrencies(currency, count) {
+    return fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency}&order=market_cap_desc&per_page=${count}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    }).then(function(response) {
+        return response.json();
+    });
 }
 
 class Graph {
@@ -187,7 +218,7 @@ class Graph {
             tick.setAttribute('stroke', 'black');
 
             let lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            let txt = document.createTextNode(value.toFixed(Math.max(0, -(pow-1))));
+            let txt = document.createTextNode(value < 1000 && value > 0.0001 ? value : value.toExponential(1));
             lbl.appendChild(txt);
             lbl.setAttribute('x', '90%');
             lbl.setAttribute('y', (ticks.length - index) * (yAxis.height.baseVal.value - axisLabelAreaSize) / ticks.length);
