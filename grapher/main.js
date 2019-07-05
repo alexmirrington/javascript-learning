@@ -1,54 +1,127 @@
 'use strict';
 
 function main() {
-    let graph = new Graph(400, 225);
-    graph.setMount(document.querySelector('#mount'));
+    let data = {
+        title: 'Weather',
+        values: Array.from({length: 12}, () => Math.random()),
+        axes: [
+            {
+                title: 'Month',
+                labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+            },
+            {
+                title: 'Average temperature'
+            }
+        ]
+    }
+    let graph = new Graph(document.querySelector('#column-graph'), data);
     graph.render();
 }
 
 class Graph {
 
-    constructor(width, height) {
-        this.mount = null;
-        this.root = null;
+    constructor(root, data) {
+        if (root === null || root.tagName !== 'svg') {
+            this.root = null;
+        } else {
+            this.root = root;
+        }
 
-        this.width = width;
-        this.height = height;
-        
-        // TODO: Decide on data format and accept actual data in params
-        this.data = Array.from(
-            {length: 25}, () => Math.random()
-        );
+        this.data = data;
     }
 
-    setMount(node) {
-        // TODO: manage unmounting
-        this.mount = node;
+    set width(val) {
+        this.root.width.baseVal.value = val;
+        this.render();
+    }
+
+    get width() {
+        return this.root.width.baseVal.value;
+    }
+
+    set height(val) {
+        this.root.height.baseVal.value = val;
+        this.render();
+    }
+
+    get height() {
+        return this.root.height.baseVal.value;
     }
 
     render() {
-        this.root = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        this.root.setAttribute('width', this.width);
-        this.root.setAttribute('height', this.height);
 
-        // TODO: Axes
-
-        // Columns
+        // TOOD: Enable colour customisation
         // TODO: Data normalisation
-        this.data.forEach((value, index) => {
-            let col = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            let gap = 5;
-            col.setAttribute('x', index * this.width / this.data.length + gap / 2.0);
-            col.setAttribute('y', this.height * (1-value));
-            col.setAttribute('width', this.width / this.data.length - gap);
-            col.setAttribute('height', value * this.height); // Assumes normalised data
-            col.setAttribute('style', 'fill:rgb(240,240,240);');
-            this.root.appendChild(col);
+        // TODO: move constants somewhere else
+        let axisLabelAreaWidth = 50;
+        let gap = 10
+
+        // TODO: Axis titles
+        let xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        xAxis.setAttribute('x', axisLabelAreaWidth);
+        xAxis.setAttribute('y', this.height - axisLabelAreaWidth);
+        xAxis.setAttribute('width', this.width - axisLabelAreaWidth);
+        xAxis.setAttribute('height', axisLabelAreaWidth);
+
+        let xAxisLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        xAxisLine.setAttribute('x1', '0%');
+        xAxisLine.setAttribute('y1', '0%');
+        xAxisLine.setAttribute('x2', '100%');
+        xAxisLine.setAttribute('y2', '0%');
+        xAxisLine.setAttribute('stroke', 'black');
+        xAxis.appendChild(xAxisLine);
+
+        this.data.axes[0].labels.forEach((value, index) => {
+            let lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            let txt = document.createTextNode(value);
+            lbl.appendChild(txt);
+            lbl.setAttribute('x', index * xAxis.width.baseVal.value / this.data.values.length + gap / 2.0);
+            lbl.setAttribute('y', '50%');
+            const txtWidth = xAxis.width.baseVal.value / this.data.values.length - 20;
+            const txtHeight = xAxis.height.baseVal.value;
+            console.log(txtWidth, txtHeight);
+            lbl.setAttribute('font-size', `${Math.min(txtWidth, txtHeight)}px`);
+            lbl.setAttribute('dominant-baseline', 'central');
+
+            xAxis.appendChild(lbl);
         });
 
-        this.mount.appendChild(this.root);
-    }
+        let yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        yAxis.setAttribute('x', 0);
+        yAxis.setAttribute('y', 0);
+        yAxis.setAttribute('width', axisLabelAreaWidth);
+        yAxis.setAttribute('height', this.height - axisLabelAreaWidth);
 
+        let yAxisLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        yAxisLine.setAttribute('x1', '100%');
+        yAxisLine.setAttribute('y1', '0%');
+        yAxisLine.setAttribute('x2', '100%');
+        yAxisLine.setAttribute('y2', '100%');
+        yAxisLine.setAttribute('stroke', 'black');
+        yAxis.appendChild(yAxisLine);
+        
+        // Columns
+        let columns = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        columns.setAttribute('x', axisLabelAreaWidth);
+        columns.setAttribute('y', 0);
+        columns.setAttribute('width', this.width - axisLabelAreaWidth);
+        columns.setAttribute('height', this.height - axisLabelAreaWidth);
+
+        this.data.values.forEach((value, index) => {
+            let col = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            col.setAttribute('x', index * columns.width.baseVal.value / this.data.values.length + gap / 2.0);
+            col.setAttribute('y', columns.height.baseVal.value * (1 - value));
+            col.setAttribute('width', columns.width.baseVal.value / this.data.values.length - gap);
+            col.setAttribute('height', value * columns.height.baseVal.value); // Assumes normalised data
+            col.setAttribute('style', 'fill:rgb(240,240,240);');
+            columns.appendChild(col);
+        });
+
+        this.root.appendChild(xAxis);
+        this.root.appendChild(yAxis);
+        this.root.appendChild(columns);
+
+    }
 }
 
 main();
