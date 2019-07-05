@@ -3,7 +3,7 @@
 function main() {
     let data = {
         title: 'Weather',
-        values: Array.from({length: 12}, () => Math.random()*0.001),
+        values: Array.from({length: 12}, () => Math.random()*100),
         axes: [
             {
                 title: 'Month',
@@ -67,8 +67,8 @@ class Graph {
         +-------+---------------------------+
         */
 
+        // TODO: Fix text font sizes so they are consistent
         // TOOD: Enable colour customisation
-        // TODO: Data normalisation
         // TODO: move constants somewhere else
         let axisLabelAreaWidth = 50;
         let gap = 10
@@ -91,6 +91,18 @@ class Graph {
         xAxis.setAttribute('width', this.width - axisLabelAreaWidth);
         xAxis.setAttribute('height', axisLabelAreaWidth);
 
+        let xAxisTitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        let xAxisTitleTxt = document.createTextNode(this.data.axes[0].title);
+        xAxisTitle.appendChild(xAxisTitleTxt);
+        xAxisTitle.setAttribute('x', '50%');
+        xAxisTitle.setAttribute('y', '75%');
+        const xAxisTitleTxtWidth = xAxis.width.baseVal.value / xAxisTitleTxt.length;
+        const xAxisTitleTxtHeight = xAxis.height.baseVal.value/4.0;
+        xAxisTitle.setAttribute('font-size', `${Math.min(xAxisTitleTxtWidth, xAxisTitleTxtHeight)}px`);
+        xAxisTitle.setAttribute('dominant-baseline', 'central');
+        xAxisTitle.setAttribute('text-anchor', 'middle');
+        xAxis.appendChild(xAxisTitle);
+
         let xAxisLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         xAxisLine.setAttribute('x1', '0%');
         xAxisLine.setAttribute('y1', '0%');
@@ -104,9 +116,9 @@ class Graph {
             let txt = document.createTextNode(value);
             lbl.appendChild(txt);
             lbl.setAttribute('x', (index+0.5) * xAxis.width.baseVal.value / this.data.values.length);
-            lbl.setAttribute('y', '50%');
-            const txtWidth = xAxis.width.baseVal.value / this.data.values.length - 20;
-            const txtHeight = xAxis.height.baseVal.value;
+            lbl.setAttribute('y', '25%');
+            const txtWidth = (xAxis.width.baseVal.value / this.data.values.length) / txt.length;
+            const txtHeight = xAxis.height.baseVal.value/4.0;
             lbl.setAttribute('font-size', `${Math.min(txtWidth, txtHeight)}px`);
             lbl.setAttribute('dominant-baseline', 'central');
             lbl.setAttribute('text-anchor', 'middle');
@@ -120,6 +132,18 @@ class Graph {
         yAxis.setAttribute('width', axisLabelAreaWidth);
         yAxis.setAttribute('height', this.height);
 
+        let yAxisTitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        let yAxisTitleTxt = document.createTextNode(this.data.axes[1].title);
+        yAxisTitle.appendChild(yAxisTitleTxt);
+        yAxisTitle.setAttribute('x', yAxis.width.baseVal.value*0.25);
+        yAxisTitle.setAttribute('y', yAxis.height.baseVal.value*0.5);
+        yAxisTitle.setAttribute('transform', `rotate(-90, ${yAxis.width.baseVal.value*0.25}, ${yAxis.height.baseVal.value*0.5})`);
+        const yAxisTitleTxtWidth = yAxis.height.baseVal.value / yAxisTitleTxt.length;
+        const yAxisTitleTxtHeight = yAxis.width.baseVal.value;
+        yAxisTitle.setAttribute('font-size', `${Math.min(yAxisTitleTxtWidth, yAxisTitleTxtHeight)}px`);
+        yAxisTitle.setAttribute('dominant-baseline', 'central');
+        yAxisTitle.setAttribute('text-anchor', 'middle');
+        yAxis.appendChild(yAxisTitle);
 
         let yAxisLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         yAxisLine.setAttribute('x1', '100%');
@@ -149,7 +173,7 @@ class Graph {
             lbl.appendChild(txt);
             lbl.setAttribute('x', '90%');
             lbl.setAttribute('y', (ticks.length - index) * (yAxis.height.baseVal.value - axisLabelAreaWidth) / ticks.length);
-            const txtWidth = 0.2*yAxis.width.baseVal.value;
+            const txtWidth = yAxis.width.baseVal.value / txt.length;
             const txtHeight = yAxis.height.baseVal.value / (2.5 * ticks.length);
             lbl.setAttribute('font-size', `${Math.min(txtWidth, txtHeight)}px`);
             lbl.setAttribute('dominant-baseline', 'central');
