@@ -5,4 +5,5 @@ A simple to-do list with very basic styling that allows you to add and remove to
 
 ## Grapher
 A simple graphing application, capable of graphing basic data using SVGs.
-![Grapher example](./grapher/grapher.png)
+
+<img src="./grapher/grapher.png" alt="Grapher example" width="400px" >
